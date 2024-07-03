@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { Account, User as AuthUser } from "next-auth";
 import User from "@/models/User";
@@ -20,6 +21,7 @@ export const authOptions: any = {
         await connect();
         try {
           const user = await User.findOne({ email: credentials.email });
+          console.log(user);
           if (user) {
             const isPassword = await bcrypt.compare(
               credentials.password,
@@ -39,8 +41,14 @@ export const authOptions: any = {
       clientId: process.env.GITHUB_ID ?? "",
       clientSecret: process.env.GITHUB_SECRET ?? "",
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+    }),
+
     // ...add more providers here
   ],
 };
 
-export default NextAuth(authOptions);
+export const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };
